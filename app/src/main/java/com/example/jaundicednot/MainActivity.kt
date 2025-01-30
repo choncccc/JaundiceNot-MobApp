@@ -201,12 +201,17 @@ class MainActivity : AppCompatActivity() {
         apiService.uploadImage(multipartBody).enqueue(object : Callback<ServerResponse> {
             override fun onResponse(call: Call<ServerResponse>, response: Response<ServerResponse>) {
                 response.body()?.let {
-                    val diagnosis = if (it.prediction == "1") "Jaundiced Eye" else "Normal Eyes"
                     runOnUiThread {
-                        resultTextView.text = "Prediction: $diagnosis"
+                        if(it.prediction.equals("1")){
+                            resultTextView.text = "Prediction: Jaundiced Eyes"
+                        }else if (it.prediction.equals("0")){
+                            resultTextView.text = "Prediction: Normal Eyes"
+                        }else
+                            resultTextView.text = "Prediction: ${it.prediction}"
                     }
                 }
             }
+
             override fun onFailure(call: Call<ServerResponse>, t: Throwable) {
                 runOnUiThread { resultTextView.text = "Error: ${t.message}" }
             }
