@@ -141,37 +141,35 @@ class MainActivity : AppCompatActivity() {
         detector.process(image)
             .addOnSuccessListener { faces ->
                 for (face in faces) {
-                    val leftEye = face.getLandmark(FaceLandmark.LEFT_EYE)
                     val rightEye = face.getLandmark(FaceLandmark.RIGHT_EYE)
 
-                    if (leftEye != null && rightEye != null) {
-                        val eyesBitmap = cropBothEyes(bitmap, leftEye, rightEye)
-                        showEyeballInDialog(eyesBitmap)
+                    if (rightEye != null) {
+                        val rightEyeBitmap = cropRightEye(bitmap, rightEye)
+                        showEyeballInDialog(rightEyeBitmap)
                     }
                 }
             }
             .addOnFailureListener { it.printStackTrace() }
     }
 
-    private fun cropBothEyes(bitmap: Bitmap, leftEye: FaceLandmark, rightEye: FaceLandmark): Bitmap {
-        val leftX = leftEye.position.x.toInt()
-        val leftY = leftEye.position.y.toInt()
+    private fun cropRightEye(bitmap: Bitmap, rightEye: FaceLandmark): Bitmap {
         val rightX = rightEye.position.x.toInt()
         val rightY = rightEye.position.y.toInt()
 
-        val paddingX = 70
-        val paddingY = 60
+        val paddingX = 50  // Adjusted for better eye focus
+        val paddingY = 50
 
-        val cropLeft = minOf(leftX, rightX) - paddingX
-        val cropTop = minOf(leftY, rightY) - paddingY
-        val cropRight = maxOf(leftX, rightX) + paddingX
-        val cropBottom = maxOf(leftY, rightY) + paddingY
+        val cropLeft = rightX - paddingX
+        val cropTop = rightY - paddingY
+        val cropRight = rightX + paddingX
+        val cropBottom = rightY + paddingY
 
         val cropWidth = cropRight - cropLeft
         val cropHeight = cropBottom - cropTop
 
         return Bitmap.createBitmap(bitmap, cropLeft, cropTop, cropWidth, cropHeight)
     }
+
 
     private fun showEyeballInDialog(eyeballBitmap: Bitmap) {
         val imageView = ImageView(this).apply {
@@ -203,10 +201,12 @@ class MainActivity : AppCompatActivity() {
         apiService.uploadImage(multipartBody).enqueue(object : Callback<ServerResponse> {
             override fun onResponse(call: Call<ServerResponse>, response: Response<ServerResponse>) {
                 response.body()?.let {
-                    runOnUiThread { resultTextView.text = "Prediction: ${it.prediction}" }
+                    val diagnosis = if (it.prediction == "1") "Jaundiced Eye" else "Normal Eyes"
+                    runOnUiThread {
+                        resultTextView.text = "Prediction: $diagnosis"
+                    }
                 }
             }
-
             override fun onFailure(call: Call<ServerResponse>, t: Throwable) {
                 runOnUiThread { resultTextView.text = "Error: ${t.message}" }
             }
