@@ -202,12 +202,14 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<ServerResponse>, response: Response<ServerResponse>) {
                 response.body()?.let {
                     runOnUiThread {
-                        if(it.prediction.equals("1")){
-                            resultTextView.text = "Prediction: Jaundiced Eyes"
+                        if (it.prediction.equals("1")) {
+                            val severityText = it.severity ?: "Unknown"
+                            resultTextView.text = "Prediction: Jaundiced Eyes\nSeverity: $severityText"
+
                         }else if (it.prediction.equals("0")){
                             resultTextView.text = "Prediction: Normal Eyes"
                         }else
-                            resultTextView.text = "Prediction: ${it.prediction}"
+                            resultTextView.text = "Prediction: ${it.prediction}" + "\nSeverity: ${it.severity}"
                     }
                 }
             }
