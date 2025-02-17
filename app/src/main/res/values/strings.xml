@@ -1,3 +1,32 @@
 <resources>
     <string name="app_name">JaundicedNot</string>
+    <string name="title_activity_onboarding">OnboardingActivity</string>
+    <string name="title_activity_on_boarding_screen1">OnBoardingScreen1</string>
+
+
+    <string name="ob1">
+        Your AI-powered assistant for jaundice detection. Capture or upload an image of your eye, and let AI analyze your sclera for signs of jaundice.
+    </string>
+    <string name="ob2_1">
+        ✅  Capture a clear image of your eye or upload an existing one.
+    </string>
+    <string name="ob2_2">
+        ✅ Our AI will analyze the sclera for possible jaundice signs.
+    </string>
+    <string name="ob2_3">
+        ✅ Get immediate results with a clear and easy-to-understand assessment.
+    </string>
+
+    <string name="ob3_1">
+        ⚠️ JaundiceNot is not a medical diagnostic tool. It provides an AI-based analysis but does not replace professional medical advice.
+    </string>
+    <string name="ob3_2">
+        ⚠️ If you receive a positive result or experience symptoms, consult a healthcare provider for confirmation and further evaluation.
+    </string>
+    <string name="ob_3_3">
+        ⚠️ Image quality matters! Ensure good lighting and avoid excessive reflections for the best results.
+    </string>
+    <string name="ob4">
+        Tap below to begin your scan and take control of your health!
+    </string>
 </resources>
