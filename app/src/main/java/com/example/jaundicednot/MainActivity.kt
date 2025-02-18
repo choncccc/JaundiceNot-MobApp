@@ -2,22 +2,24 @@ package com.example.jaundicednot
 
 import ApiService
 import android.Manifest
-import android.content.ContentValues
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
@@ -39,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageCapture: ImageCapture
     private lateinit var pickImage: ImageButton
     private var isFrontCamera = true
+    private var croppedEyeBitmap: Bitmap? = null
 
     private val PICK_IMAGE_REQUEST = 1
 
@@ -88,14 +91,25 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    private fun rotateBitmapToCorrectOrientation(source: Bitmap, rotationDegrees: Float): Bitmap {
+        val matrix = android.graphics.Matrix().apply {
+            postRotate(rotationDegrees)
+        }
+        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+    }
     private fun captureImage() {
         imageCapture.takePicture(
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                    val rotationDegrees = imageProxy.imageInfo.rotationDegrees.toFloat()
                     val bitmap = imageProxy.toBitmap()
                     imageProxy.close()
-                    bitmap?.let { processImage(it) }
+
+                    bitmap?.let {
+                        val rotatedBitmap = rotateBitmapToCorrectOrientation(it, rotationDegrees)
+                        processImage(rotatedBitmap)
+                    }
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -103,6 +117,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
     }
+
 
     private fun pickImageFromGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -144,8 +159,8 @@ class MainActivity : AppCompatActivity() {
                     val rightEye = face.getLandmark(FaceLandmark.RIGHT_EYE)
 
                     if (rightEye != null) {
-                        val rightEyeBitmap = cropRightEye(bitmap, rightEye)
-                        showEyeballInDialog(rightEyeBitmap)
+                        croppedEyeBitmap = cropRightEye(bitmap, rightEye)
+                        croppedEyeBitmap?.let { showCustomDialog(it) }
                     }
                 }
             }
@@ -156,7 +171,7 @@ class MainActivity : AppCompatActivity() {
         val rightX = rightEye.position.x.toInt()
         val rightY = rightEye.position.y.toInt()
 
-        val paddingX = 50  // Adjusted for better eye focus
+        val paddingX = 50
         val paddingY = 50
 
         val cropLeft = rightX - paddingX
@@ -170,19 +185,23 @@ class MainActivity : AppCompatActivity() {
         return Bitmap.createBitmap(bitmap, cropLeft, cropTop, cropWidth, cropHeight)
     }
 
+    private fun showCustomDialog(eyeballBitmap: Bitmap) {
+        val dialog = Dialog(this)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_show_eye, null)
+        dialog.window?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.border))
+        dialog.setContentView(dialogView)
 
-    private fun showEyeballInDialog(eyeballBitmap: Bitmap) {
-        val imageView = ImageView(this).apply {
-            setImageBitmap(eyeballBitmap)
-            layoutParams = LinearLayout.LayoutParams(600, 300).apply {
-                setMargins(10, 10, 10, 10)
-            }
+        val imageContainer = dialogView.findViewById<ImageView>(R.id.imageResult)
+        val btnOk = dialogView.findViewById<Button>(R.id.okButton)
+
+        imageContainer.setImageBitmap(eyeballBitmap)
+
+        btnOk.setOnClickListener {
+            sendImageToServer(eyeballBitmap)
+            dialog.dismiss()
         }
 
-        AlertDialog.Builder(this)
-            .setView(imageView)
-            .setPositiveButton("OK") { _, _ -> sendImageToServer(eyeballBitmap) }
-            .show()
+        dialog.show()
     }
 
     private fun sendImageToServer(bitmap: Bitmap) {
@@ -203,12 +222,17 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<ServerResponse>, response: Response<ServerResponse>) {
                 response.body()?.let {
                     runOnUiThread {
-                        if(it.prediction.equals("1")){
-                            resultTextView.text = "Prediction: Jaundiced Eyes Confidence: ${it.confidence}"
-                        }else if (it.prediction.equals("0")){
-                            resultTextView.text = "Prediction: Normal Eyes | Confidence: ${it.confidence}"
-                        }else
-                            resultTextView.text = "Prediction: ${it.prediction} Confidence: ${it.confidence}"
+                        when (it.prediction) {
+                            "1" -> {
+                                resultTextView.text = "Prediction: Jaundiced Eyes"
+                            }
+                            "0" -> {
+                                resultTextView.text = "Prediction: Normal Eyes"
+                            }
+                            else -> {
+                                resultTextView.text = "Prediction: ${it.prediction}"
+                            }
+                        }
                     }
                 }
             }
