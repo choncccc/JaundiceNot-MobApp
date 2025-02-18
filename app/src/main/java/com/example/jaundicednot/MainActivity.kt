@@ -190,7 +190,8 @@ class MainActivity : AppCompatActivity() {
         FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.100.7:5000/")
+            //.baseUrl("http://192.168.100.7:5000/") //IP sa PC
+            .baseUrl("http://192.168.246.74:5000/") //IP sa Laptop
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -202,14 +203,12 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<ServerResponse>, response: Response<ServerResponse>) {
                 response.body()?.let {
                     runOnUiThread {
-                        if (it.prediction.equals("1")) {
-                            val severityText = it.severity ?: "Unknown"
-                            resultTextView.text = "Prediction: Jaundiced Eyes\nSeverity: $severityText"
-
+                        if(it.prediction.equals("1")){
+                            resultTextView.text = "Prediction: Jaundiced Eyes Confidence: ${it.confidence}"
                         }else if (it.prediction.equals("0")){
-                            resultTextView.text = "Prediction: Normal Eyes"
+                            resultTextView.text = "Prediction: Normal Eyes | Confidence: ${it.confidence}"
                         }else
-                            resultTextView.text = "Prediction: ${it.prediction}" + "\nSeverity: ${it.severity}"
+                            resultTextView.text = "Prediction: ${it.prediction} Confidence: ${it.confidence}"
                     }
                 }
             }
