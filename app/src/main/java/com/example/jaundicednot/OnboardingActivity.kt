@@ -1,26 +1,25 @@
 package com.example.jaundicednot
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator
 
-
 class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var adapter: OnboardingAdapter
     private lateinit var btnNext: Button
-    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-        if (hasCompletedOnboarding()) {
+        val preferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        val hasCompletedOnboarding = preferences.getBoolean("has_completed_onboarding", false)
+
+        if (hasCompletedOnboarding) {
             navigateToMainActivity()
             return
         }
@@ -56,16 +55,13 @@ class OnboardingActivity : AppCompatActivity() {
             }
         })
     }
-    private fun hasCompletedOnboarding(): Boolean {
-        return sharedPreferences.getBoolean("onboarding_completed", false)
-    }
 
     private fun markOnboardingCompleted() {
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("onboarding_completed", true)
+        val preferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        val editor = preferences.edit()
+        editor.putBoolean("has_completed_onboarding", true)
         editor.apply()
     }
-
     private fun navigateToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
