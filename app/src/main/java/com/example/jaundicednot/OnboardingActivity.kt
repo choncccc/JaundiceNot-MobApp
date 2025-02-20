@@ -28,16 +28,13 @@ class OnboardingActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_onboarding)
 
-        // Initialize Views
         viewPager = findViewById(R.id.viewPager)
         btnNext = findViewById(R.id.btnNext)
         val dotsIndicator = findViewById<WormDotsIndicator>(R.id.dotsIndicator)
 
-        // Setup ViewPager2 with Adapter
         adapter = OnboardingAdapter(this)
         viewPager.adapter = adapter
 
-        // Attach dotsIndicator to ViewPager2
         dotsIndicator.attachTo(viewPager)
 
         // Handle Next Button Click
@@ -51,25 +48,22 @@ class OnboardingActivity : AppCompatActivity() {
             }
         }
 
-        // Update the button text based on the current page
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 if (position == adapter.itemCount - 1) {
-                    btnNext.text = "Finish"  // Change text when on the last page
+                    btnNext.text = "Finish"
                 } else {
-                    btnNext.text = "Next"  // Default text for other pages
+                    btnNext.text = "Next"
                 }
             }
         })
     }
 
-    // Check if the user has already completed onboarding
     private fun hasCompletedOnboarding(): Boolean {
         return sharedPreferences.getBoolean("onboarding_completed", false)
     }
 
-    // Mark the onboarding as completed
     private fun markOnboardingCompleted() {
         val editor = sharedPreferences.edit()
         editor.putBoolean("onboarding_completed", true)
@@ -80,6 +74,6 @@ class OnboardingActivity : AppCompatActivity() {
     private fun navigateToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-        finish()  // Close the onboarding activity to prevent going back
+        finish()
     }
 }
