@@ -45,5 +45,18 @@
             android:textColor="@color/black"
             android:textSize="14dp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtFAQ"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/underlined_text"
+            android:layout_marginTop="30dp"
+            android:textColorLink="@color/blue"
+            android:fontFamily="@font/gt_light"
+            android:textSize="14dp"
+            android:textStyle="bold|italic"/>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

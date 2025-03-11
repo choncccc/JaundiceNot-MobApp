@@ -3,9 +3,11 @@
     <string name="title_activity_onboarding">OnboardingActivity</string>
     <string name="title_activity_on_boarding_screen1">OnBoardingScreen1</string>
 
+    <string name="underlined_text"><u>What is Jaundice?</u></string>
+
 
     <string name="ob1">
-        Your AI-powered assistant for jaundice detection. Capture or upload an image of your eye, and let AI analyze your sclera for signs of jaundice.
+        Your AI-powered assistant for Jaundice Detection. Capture or upload an image of your eye, and let AI analyze your sclera for signs of jaundice.
     </string>
     <string name="ob2_1">
         ✅  Capture a clear image of your eye or upload an existing one.
