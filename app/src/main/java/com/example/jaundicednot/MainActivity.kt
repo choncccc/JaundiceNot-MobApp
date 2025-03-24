@@ -38,7 +38,7 @@ import java.io.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var previewView: PreviewView
-    private lateinit var captureButton: Button
+    private lateinit var captureButton: ImageButton
     private lateinit var switchCameraButton: ImageButton
     private lateinit var resultTextView: TextView
     private lateinit var imageCapture: ImageCapture
