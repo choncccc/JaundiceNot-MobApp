@@ -284,8 +284,6 @@ class MainActivity : AppCompatActivity() {
         FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
 
         val retrofit = Retrofit.Builder()
-            /*.baseUrl("http://192.168.100.7:5000/") IP sa PC
-            .baseUrl("http://192.168.100.176:5000/") IP sa Laptop*/
             .baseUrl("https://flaskapp-jaundicenot-production.up.railway.app/") //IP sa Railway
             .addConverterFactory(GsonConverterFactory.create())
             .build()

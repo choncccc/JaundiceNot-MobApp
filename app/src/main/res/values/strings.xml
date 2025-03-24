@@ -10,7 +10,7 @@
         Your AI-powered assistant for Jaundice Detection. Capture or upload an image of your eye, and let AI analyze your sclera for signs of jaundice.
     </string>
     <string name="ob2_1">
-        ✅  Capture a clear image of your eye or upload an existing one.
+        ✅  Capture a clear image of your face or upload an existing one. The eye region will be automatically segmented for analysis.
     </string>
     <string name="ob2_2">
         ✅ Our AI will analyze the sclera for possible jaundice signs.
